@@ -1,0 +1,26 @@
+document.addEventListener('DOMContentLoaded', () => {
+  const apiKeyInput = document.getElementById('apiKeyInput');
+  const saveBtn = document.getElementById('saveBtn');
+  const testBtn = document.getElementById('testBtn');
+  const testResult = document.getElementById('test-result');
+
+  chrome.storage.local.get(['geminiKey'], (result) => {
+    if (result.geminiKey) apiKeyInput.value = result.geminiKey;
+  });
+
+  saveBtn.addEventListener('click', () => {
+    chrome.storage.local.set({ geminiKey: apiKeyInput.value.trim() }, () => {
+      document.getElementById('save-status').style.display = 'block';
+      setTimeout(() => { document.getElementById('save-status').style.display = 'none'; }, 2000);
+    });
+  });
+
+  testBtn.addEventListener('click', () => {
+    testResult.style.display = 'block';
+    testResult.innerText = "Testing...";
+    
+    chrome.runtime.sendMessage({ type: "GET_AI_ANSWER", question: "Say 'Connection Successful!'" }, (response) => {
+      testResult.innerText = response.answer;
+    });
+  });
+});
